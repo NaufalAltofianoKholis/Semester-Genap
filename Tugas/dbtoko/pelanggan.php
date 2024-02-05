@@ -1,18 +1,3 @@
-<form action="" method="post">
-    pelanggan:
-    <input type="text" name="namapelanggan" placeholder="nama pelanggan">
-    <br>
-    harga:
-    <input type="text" name="alamat" placeholder="alamat">
-    <br>
-    stok:
-    <input type="number" name="telepon" placeholder="nomor telepon">
-    <br>
-
-    <input type="submit" name="simpan" value="simpan">
-    
-</form>
-
 <?php
 
 $host="127.0.0.1";
@@ -21,20 +6,89 @@ $password="";
 $db="dbtoko";
 $koneksi=new mysqli($host,$user,$password,$db);
 
-if(isset($_POST["simpan"])){
-$nama_pelanggan=$_POST["namapelanggan"];
-$alamat=$_POST["alamat"];
-$nomor_telepon=$_POST["telepon"];
+$id=0;
+$namapelanggan="";
+$alamat="";
+$nomortelepon=0;
+
+if(isset($_GET["ubah"])){
+    $id=$_GET["ubah"];
+    $sql= "SELECT * FROM pelanggan WHERE id=". $id;
+    $hasil=mysqli_query($koneksi,$sql);
+
+    if(mysqli_num_rows($hasil)>0){
+        $row=mysqli_fetch_array($hasil);
+        $id=$row[0];
+        $namapelanggan=$row[1];
+        $alamat =$row[2];
+        $nomortelepon= $row[3];
+}
+
+}       
+
+?>
+
+<form action="" method="post">
+    pelanggan:
+    <input type="text" name="namapelanggan" placeholder="nama pelanggan" value ="<?php echo $namapelanggan?>">
+    <br>
+    alamat:
+    <input type="text" name="alamat" placeholder="alamat" value ="<?php echo $alamat?>">
+    <br>
+     nomortelepon:
+    <input type="number" name="nomortelepon" placeholder="nomor nomortelepon"value ="<?php echo $nomortelepon?>">
+    <br>
+
+    <input type="submit" name="simpan" value="simpan">
+    <br>
+
+  <input type="hidden" name="id" value="<?php echo $id ?>">
+</form>
 
 
-$sql="INSERT INTO pelanggan (nama_pelanggan,alamat,nomor_telepon) VALUES ('$nama_pelanggan','$alamat',$nomor_telepon)";
-$hasil=mysqli_query($koneksi,$sql);
+
+<?php
+
+
+
+if (isset($_POST["simpan"])){
+
+        $namapelanggan=$_POST["namapelanggan"];
+        $alamat=$_POST["alamat"];
+        $nomortelepon=$_POST["nomortelepon"];
+        
+        if (isset($_POST["id"])){
+            $id=$_POST["id"];
+
+           if($id==0){
+        
+        $sql="INSERT INTO pelanggan (namapelanggan,alamat,nomortelepon) VALUES ('$namapelanggan','$alamat',$nomortelepon)";
+        $hasil=mysqli_query($koneksi,$sql);
+        }
+    
+        else{   
+            $sql="UPDATE pelanggan SET namapelanggan='$namapelanggan',alamat='$alamat',nomortelepon=$nomortelepon WHERE id=".$id;
+                $hasil=mysqli_query($koneksi,$sql);
+            header("location:http://localhost/Semester-Genap/Tugas/dbtoko/pelanggan.php");
+        }
+    }
+
 }
 
 
+
+
+if(isset($_GET["hapus"])){  
+    $id=$_GET["hapus"];
+    $sql= "DELETE FROM pelanggan WHERE id=".$id;
+    $hasil=mysqli_query($koneksi,$sql);
+}
+
 $sql="SELECT * FROM pelanggan";
-$hasil=mysqli_query($koneksi, $sql,);
-var_dump ($hasil);
+$hasil=mysqli_query($koneksi, $sql);
+
+
+// var_dump ($hasil);
 
 echo "<table border=1px >
 <thead>
@@ -48,6 +102,12 @@ echo "<table border=1px >
             <th>
                 NOMOR
             </th>
+            <th>
+                HAPUS
+            </th>
+            <th>
+                UBAH
+            </th>
         </tr>
 </thead>
 <tbody>
@@ -59,6 +119,9 @@ while($row=mysqli_fetch_array($hasil)){
     echo "<td>" . $row[1] . "</td>";
     echo "<td>" . $row[2] . "</td>";
     echo "<td>" . $row[3] . "</td>";
+    echo "<td>" . "<a href='?hapus=".$row[0]."'>hapus</a>" . "</td>";
+    echo "<td>" . "<a href='?ubah=".$row[0]."'>ubah</a>" . "</td>";
+
     echo "</tr>";
 }
 
