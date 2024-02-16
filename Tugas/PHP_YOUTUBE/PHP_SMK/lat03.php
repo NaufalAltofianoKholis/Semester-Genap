@@ -1,5 +1,4 @@
-<?php
-
+<?php 
     
     function belajar(){
         echo "saya belajar PHP";
@@ -22,5 +21,4 @@
     }
 
     echo luas(10,30) * 5;
-
 ?>
